@@ -25,7 +25,7 @@ class Weather:
             self.save_response(file)
         sec = getmtime(file)
         now = datetime.now().timestamp()
-        if now - sec < 60 * 60:
+        if now - sec < 60 * 60 * 24:
             with open(file, "r+") as f:
                 self.response = json.load(f)
         else:
