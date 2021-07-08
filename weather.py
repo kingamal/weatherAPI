@@ -66,7 +66,11 @@ class Weather:
         return self
 
     def __next__(self):
-        return 52.37
+        if len(self.what_weather) <= self.counter:
+            raise StopIteration
+        what_date = list(self.what_weather.keys())[self.counter]
+        self.counter += 1
+        return what_date
 
 weather = Weather()
 key = input()
@@ -93,3 +97,5 @@ else:
 
 print(weather['2021-07-08'])
 print(weather.items())
+for w in weather:
+    print(w)
