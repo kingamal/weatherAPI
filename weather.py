@@ -8,6 +8,8 @@ from os.path import getmtime, exists
 class Weather:
     def __init__(self):
         self.response = []
+        self.what_weather = {}
+        self.counter = 0
 
     def get_response(self, key):
         url = "https://community-open-weather-map.p.rapidapi.com/forecast"
@@ -23,6 +25,7 @@ class Weather:
         if not exists(file):
             self.get_response(key)
             self.save_response(file)
+            return
         sec = getmtime(file)
         now = datetime.now().timestamp()
         if now - sec < 60 * 60 * 24:
@@ -39,13 +42,35 @@ class Weather:
         return True
 
     def forecast(self):
-        what_weather = {}
         for day in self.response["list"]:
             date = datetime.utcfromtimestamp(day["dt"]).strftime("%Y-%m-%d") #unixtime
             forecast = day["weather"][0]["main"]
-            what_weather[date] = forecast
-        return what_weather
+            self.what_weather[date] = forecast
+        return self.what_weather
 
+    def __getitem__(self, item):
+        if item not in self.what_weather:
+            return 'Nie wiem'
+        if 'Rain' in self.what_weather[item]:
+            return 'Bedzie padac'
+        elif 'Snow' in self.what_weather[item]:
+            return 'Bedzie padac'
+        else:
+            return 'Nie bedzie padac'
+
+    def items(self):
+        return self.what_weather.items()
+
+    def __iter__(self):
+        self.counter = 0
+        return self
+
+    def __next__(self):
+        if len(self.what_weather) <= self.counter:
+            raise StopIteration
+        what_date = list(self.what_weather.keys())[self.counter]
+        self.counter += 1
+        return what_date
 
 weather = Weather()
 key = input()
@@ -68,3 +93,9 @@ elif sys.argv[2] in dictionary:
         print('Nie bedzie padac')
 else:
     print('Nie wiem')
+
+
+print(weather['2021-07-08'])
+print(weather.items())
+for w in weather:
+    print(w)
